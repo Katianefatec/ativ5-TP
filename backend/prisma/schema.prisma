@@ -1,0 +1,77 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Cliente {
+  id        Int       @id @default(autoincrement())
+  nome                String
+  nomeSocial          String
+  genero              String
+  cpf                 CPF?
+  cpfId               Int       @unique
+  rg                  RG[]
+  dataCadastro        DateTime
+  telefones           Telefone[]
+  quantidadeConsumida Int
+  empresas            Empresa[] @relation("ClientesDaEmpresa")
+}
+
+model Produto {
+  id                  Int       @id @default(autoincrement())
+  nome                String
+  valor               Float
+  quantidadeConsumida Int
+  empresas            Empresa[] @relation("ProdutosDaEmpresa")
+}
+
+model Servico {
+  id                  Int       @id @default(autoincrement())
+  nome                String
+  valor               Float
+  quantidadeConsumida Int
+  empresas            Empresa[] @relation("ServicosDaEmpresa")
+}
+
+model Empresa {
+  id        Int       @id @default(autoincrement())
+  compras   Compra[]
+  clientes  Cliente[] @relation("ClientesDaEmpresa")
+  produtos  Produto[] @relation("ProdutosDaEmpresa")
+  servicos  Servico[] @relation("ServicosDaEmpresa")
+}
+
+model CPF {
+  id          Int      @id @default(autoincrement())
+  valor       String
+  dataEmissao DateTime
+  cliente     Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId   Int      @unique
+}
+
+model RG {
+  id          Int      @id @default(autoincrement())
+  valor       String
+  dataEmissao DateTime
+  cliente     Cliente  @relation(fields: [clienteId], references: [id])
+  clienteId   Int
+}
+
+model Telefone {
+  id        Int     @id @default(autoincrement())
+  ddd       String
+  numero    String
+  cliente   Cliente @relation(fields: [clienteId], references: [id])
+  clienteId Int
+}
+
+model Compra {
+  id        Int       @id @default(autoincrement())
+  empresa   Empresa   @relation(fields: [empresaId], references: [id])
+  empresaId Int
+  
+}
