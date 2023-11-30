@@ -3,8 +3,7 @@ CREATE TABLE "Cliente" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "nome" TEXT NOT NULL,
     "nomeSocial" TEXT NOT NULL,
-    "genero" TEXT NOT NULL,
-    "cpfId" INTEGER NOT NULL,
+    "genero" TEXT NOT NULL,    
     "dataCadastro" DATETIME NOT NULL,
     "quantidadeConsumida" INTEGER NOT NULL
 );

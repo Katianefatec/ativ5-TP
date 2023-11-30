@@ -8,57 +8,39 @@ generator client {
 }
 
 model Cliente {
+  id                    Int       @id @default(autoincrement())
+  nome                  String
+  nomeSocial            String
+  genero                String  
+  dataCadastro          DateTime
+  telefones             Telefone[]
+  compras               Compra[]
+  endereco              Endereco?
+}
+
+model Compra {
   id        Int       @id @default(autoincrement())
-  nome                String
-  nomeSocial          String
-  genero              String
-  cpf                 CPF?
-  cpfId               Int       @unique
-  rg                  RG[]
-  dataCadastro        DateTime
-  telefones           Telefone[]
-  quantidadeConsumida Int
-  empresas            Empresa[] @relation("ClientesDaEmpresa")
+  quantidade Int
+  cliente   Cliente   @relation(fields: [clienteId], references: [id])
+  clienteId Int
+  produto   Produto   @relation(fields: [produtoId], references: [id])
+  produtoId Int
+  servico   Servico   @relation(fields: [servicoId], references: [id])
+  servicoId Int
 }
 
 model Produto {
   id                  Int       @id @default(autoincrement())
   nome                String
   valor               Float
-  quantidadeConsumida Int
-  empresas            Empresa[] @relation("ProdutosDaEmpresa")
+  compras             Compra[]
 }
 
 model Servico {
   id                  Int       @id @default(autoincrement())
   nome                String
   valor               Float
-  quantidadeConsumida Int
-  empresas            Empresa[] @relation("ServicosDaEmpresa")
-}
-
-model Empresa {
-  id        Int       @id @default(autoincrement())
-  compras   Compra[]
-  clientes  Cliente[] @relation("ClientesDaEmpresa")
-  produtos  Produto[] @relation("ProdutosDaEmpresa")
-  servicos  Servico[] @relation("ServicosDaEmpresa")
-}
-
-model CPF {
-  id          Int      @id @default(autoincrement())
-  valor       String
-  dataEmissao DateTime
-  cliente     Cliente  @relation(fields: [clienteId], references: [id])
-  clienteId   Int      @unique
-}
-
-model RG {
-  id          Int      @id @default(autoincrement())
-  valor       String
-  dataEmissao DateTime
-  cliente     Cliente  @relation(fields: [clienteId], references: [id])
-  clienteId   Int
+  compras             Compra[]
 }
 
 model Telefone {
@@ -69,9 +51,15 @@ model Telefone {
   clienteId Int
 }
 
-model Compra {
-  id        Int       @id @default(autoincrement())
-  empresa   Empresa   @relation(fields: [empresaId], references: [id])
-  empresaId Int
-  
+model Endereco {
+  id                    Int      @id @default(autoincrement())
+  cidade                String
+  estado                String
+  bairro                String
+  rua                   String
+  numero                String
+  codigoPostal          String
+  informacoesAdicionais String
+  cliente               Cliente @relation(fields: [clienteId], references: [id])
+  clienteId             Int     @unique
 }
