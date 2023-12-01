@@ -90,7 +90,7 @@ function CadastroSJC() {
             });
     }
 
-    function handleEnderecoChange(event: React.ChangeEvent<HTMLInputElement>) {
+    function handleEnderecoChange(event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
         const { name, value } = event.target;
         setState(prevState => ({
             ...prevState,
@@ -101,17 +101,18 @@ function CadastroSJC() {
         }));
     }
 
-    function handleTelefoneChange(event: ChangeEvent<HTMLInputElement>, index: number) {
-        const { name, value } = event.target;
+    const handleTelefoneChange = (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        const value = event.target.value;
+        const ddd = value.slice(0, 2);
+        const numero = value.slice(2);
+    
         setState(prevState => {
-            const newTelefones = prevState.telefones.map((telefone, i) => {
-                if (i !== index) return telefone;
-                return { ...telefone, [name]: value };
-            });
+            const newTelefones = [...prevState.telefones];
+            newTelefones[index] = { ...newTelefones[index], ddd, numero };
             return { ...prevState, telefones: newTelefones };
         });
-    }
-
+    };
+    
     return (
         <>
         <div className={styles['container-lista']}>
@@ -131,41 +132,94 @@ function CadastroSJC() {
                     </div>   
                     <div className={styles['form-group']}>
                      <label>Rua:</label>
-                     <input type="text" name="rua" value={state.endereco.rua} onChange={handleEnderecoChange} required />
+                     <input type="text" className={styles['full-width']} name="rua" value={state.endereco.rua} onChange={handleEnderecoChange} required />
                     
-                 </div>
-                 <div className={styles['form-group'] + ' ' + styles['flex-container'] }>
-                     <div className={styles['half']}>
-                         <label>Número:</label>
-                         <input type="text" name="numero" value={state.endereco.numero} onChange={handleEnderecoChange} required />
-                     </div>                
-                     <div className={styles['half']}>
-                         <label>Bairro:</label>                    
-                         <input type="text" name="bairro" value={state.endereco.bairro} onChange={handleEnderecoChange} required />
-                     </div>
-                     <div className={styles['half']}>                    
-                        <label>CEP:</label>
-                        <input type="text" name="codigoPostal" value={state.endereco.codigoPostal} onChange={handleEnderecoChange}  />
-                    </div>                          
-                 </div>                     
-                    
-                    <div className={styles['form-group'] + ' ' + styles['flex-container']}>
+                    </div>
+                    <div className={styles['form-group'] + ' ' + styles['flex-container'] }>
                         <div className={styles['half']}>
-                            <label>Gênero:</label>
-                            <input type="text" name="genero" value={state.genero} onChange={handleInputChange} required />
+                            <label>Número:</label>
+                            <input type="text" name="numero" value={state.endereco.numero} onChange={handleEnderecoChange} required />
+                        </div>                
+                        <div className={styles['half']}>
+                            <label>Bairro:</label>                    
+                            <input type="text" name="bairro" value={state.endereco.bairro} onChange={handleEnderecoChange} required />
+                        </div>
+                        <div className={styles['half']}>                    
+                            <label>CEP:</label>
+                            <input type="text" name="codigoPostal" value={state.endereco.codigoPostal} onChange={handleEnderecoChange}  />
+                        </div>                          
+                    </div>       
+                    <div className={styles['form-group'] + ' ' + styles['flex-container'] }>
+                        <div className={styles['half']}>
+                            <label>Estado:</label>
+                            <select name="estado" value={state.endereco.estado} onChange={handleEnderecoChange} required>
+                                <option value="">Selecione...</option>
+                                <option value="AC">Acre</option>
+                                <option value="AL">Alagoas</option>
+                                <option value="AP">Amapá</option>
+                                <option value="AM">Amazonas</option>
+                                <option value="BA">Bahia</option>
+                                <option value="CE">Ceará</option>
+                                <option value="DF">Distrito Federal</option>
+                                <option value="ES">Espírito Santo</option>
+                                <option value="GO">Goiás</option>
+                                <option value="MA">Maranhão</option>
+                                <option value="MT">Mato Grosso</option>
+                                <option value="MS">Mato Grosso do Sul</option>
+                                <option value="MG">Minas Gerais</option>
+                                <option value="PA">Para</option>
+                                <option value="PB">Paraíba</option>
+                                <option value="PR">Paraná</option>
+                                <option value="PE">Pernambuco</option>
+                                <option value="PI">Piauí</option>
+                                <option value="RJ">Rio de Janeiro</option>
+                                <option value="RN">Rio Grande do Norte</option>
+                                <option value="RS">Rio Grande do Sul</option>
+                                <option value="RO">Rondônia</option>
+                                <option value="RR">Roraima</option>
+                                <option value="SC">Santa Catarina</option>
+                                <option value="SP">São Paulo</option>
+                                <option value="SE">Sergipe</option>
+                                <option value="TO">Tocantins</option>
+                                <option value="EX">Estrangeiro</option>                                 
+                            </select>                               
                         </div>
                         <div className={styles['half']}>
-                            <label>Telefones:</label>
-                            {state.telefones.map((telefone, index) => (
-                                <div key={index}>
-                                    <label>DDD:</label>
-                                    <input type="text" name="ddd" value={telefone.ddd} onChange={(event) => handleTelefoneChange(event, index)} />
-                                    <label>Número:</label>
-                                    <input type="text" name="numero" value={telefone.numero} onChange={(event) => handleTelefoneChange(event, index)} />
-                                </div>
+                                <label>Cidade:</label>
+                                <input type="text" name="cidade" value={state.endereco.cidade} onChange={handleEnderecoChange} required />
+                                
+                        </div>  
+                        <div className={styles['half']}>
+                        <label>Telefones:</label>
+                        {state.telefones.map((telefone, index) => (
+                            <div key={index}>
+                                <input
+                                type="text"
+                                name="telefone"
+                                value={telefone.ddd && telefone.numero ? `${telefone.ddd}${telefone.numero}` : ''}
+                                onChange={(event) => handleTelefoneChange(event, index)}
+                                placeholder="(DD)9999-9999"
+                                required
+                                />
+                            </div>
                             ))}
+                    </div>     
+                    </div>         
+                 {/* <div className={styles['half']}>
+                     <label>Telefone:</label>
+                     <input type="text" name="telefone" value={state.telefones[0]?.numero} onChange={handlePhoneChange} required />
+                 </div>        */}
+                
+       
+                    
+                    <div className={styles['form-group'] + ' ' + styles['flex-container']}>
+                        
+                    
+                    <div className={styles['half']}>
+                            <label>Gênero:</label>
+                            <input type="text" name="genero" value={state.genero} onChange={handleInputChange} required />
                     </div>
-                    </div>
+                </div>
                     <div className={styles['form-group']}>
                         <input type="submit" value="Enviar" />
                     </div>
@@ -231,7 +285,7 @@ function CadastroSJC() {
 //             <form onSubmit={handleSubmit}>
 //                 <div className={styles['form-group']}>
 //                     <label>Nome:</label>
-//                     <input type="text" className={styles['full-width']} name="nome" value={novoCliente.nome} onChange={handleNomeChange} required />
+//                     <input type="text" className={styles['full-width']} name="nome" value={state.nome} onChange={handleNomeChange} required />
 //                 </div>
 //                 <div className={styles['form-group']}>
 //                     <label>Sobrenome:</label>

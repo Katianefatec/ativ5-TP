@@ -1,9 +1,12 @@
 export interface Telefone {
+  id: number;
   ddd: string;
   numero: string;
+  clienteId: number;
 }
 
 export interface Endereco {
+  id?: number;
   cidade: string;
   estado: string;
   bairro: string;
@@ -11,16 +14,15 @@ export interface Endereco {
   numero: string;
   codigoPostal: string;
   informacoesAdicionais: string;
+  clienteId?: number;
 }
 
 export interface Cliente {
-  id: string;
+  id: number;
   nome: string;
-  sobreNome: string;
-  endereco: Endereco;
-  telefones: Telefone[];
   nomeSocial: string;
   genero: string;
-  dataCadastro: Date;
-
+  dataCadastro: string;
+  endereco: Endereco;
+  telefones: Telefone[];
 }

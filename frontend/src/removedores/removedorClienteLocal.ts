@@ -6,7 +6,7 @@ interface RemovedorLocal {
 
 export default class RemovedorClienteLocal implements RemovedorLocal {
     public remover(clientes: Cliente[], id: string): Cliente[] {
-      let clientesRestantes = clientes.filter(cliente => cliente.id !== id)
+      let clientesRestantes = clientes.filter(cliente => cliente.id !== Number(id))
       return clientesRestantes;
     }
 }

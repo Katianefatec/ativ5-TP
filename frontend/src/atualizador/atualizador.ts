@@ -1,4 +1,4 @@
 interface Atualizador {
-    atualizar(objeto: Object): void
+    atualizar(id: string, objeto: Object): void;
 }
 export default Atualizador
