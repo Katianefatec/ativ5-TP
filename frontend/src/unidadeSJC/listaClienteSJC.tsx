@@ -86,7 +86,7 @@ const handleNomeSocialChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     return prevState;
   });
 };
-const handleEnderecoChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+const handleEnderecoChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
   const field = event.target.name as keyof Endereco;
   const value = event.target.value;
   setClienteAtualizar(prevState => {
@@ -144,10 +144,22 @@ const excluirRemoto = (idCliente: string) => {
 };
 function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
   const { name, value } = event.target;
-  setState(prevState => ({
-    ...prevState,
-    [name]: value
-  }));
+  setClienteAtualizar(prevState => {
+    if (prevState) {
+      return { ...prevState, [name]: value };
+    }
+    return prevState;
+  });
+}
+
+function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
+  const { name, value } = event.target;
+  setClienteAtualizar(prevState => {
+    if (prevState) {
+      return { ...prevState, [name]: value };
+    }
+    return prevState;
+  });
 }
 
 
@@ -233,7 +245,7 @@ return (
                         <input type="text" name="nome" value={clienteAtualizar.nome} onChange={handleNomeChange} className={styles['full-width-input']} />
                       </label>
                       <label>
-                        Sobrenome:
+                        Nome Social:
                         <br />
                         <input type="text" name="nomeSocial" value={clienteAtualizar.nomeSocial} onChange={handleNomeSocialChange} className={styles['full-width-input']}/>
                       </label>
@@ -267,10 +279,39 @@ return (
                         </label>
                       </div>
                       <div className={styles['flex-container-modal']}>
-                        <label className={styles['flex-item-modal']}>
-                          Estado:
-                          <br />
-                          <input type="text" name="estado" value={clienteAtualizar.endereco.estado} onChange={handleEnderecoChange} />
+                      <label className={styles['flex-item-modal']}>
+                        Estado:
+                        <br />
+                        <select name="estado" value={clienteAtualizar.endereco.estado} onChange={handleEnderecoChange}>
+                            <option value="AC">Acre</option>
+                            <option value="AL">Alagoas</option>
+                            <option value="AP">Amapá</option>
+                            <option value="AM">Amazonas</option>
+                            <option value="BA">Bahia</option>
+                            <option value="CE">Ceará</option>
+                            <option value="DF">Distrito Federal</option>
+                            <option value="ES">Espírito Santo</option>
+                            <option value="GO">Goiás</option>
+                            <option value="MA">Maranhão</option>
+                            <option value="MT">Mato Grosso</option>
+                            <option value="MS">Mato Grosso do Sul</option>
+                            <option value="MG">Minas Gerais</option>
+                            <option value="PA">Pará</option>
+                            <option value="PB">Paraíba</option>
+                            <option value="PR">Paraná</option>
+                            <option value="PE">Pernambuco</option>
+                            <option value="PI">Piauí</option>
+                            <option value="RJ">Rio de Janeiro</option>
+                            <option value="RN">Rio Grande do Norte</option>
+                            <option value="RS">Rio Grande do Sul</option>
+                            <option value="RO">Rondônia</option>
+                            <option value="RR">Roraima</option>
+                            <option value="SC">Santa Catarina</option>
+                            <option value="SP">São Paulo</option>
+                            <option value="SE">Sergipe</option>
+                            <option value="TO">Tocantins</option>
+                            <option value="EX">Estrangeiro</option>
+                        </select>
                         </label>
                         <label className={styles['flex-item-modal']}>
                           Telefone:
@@ -284,6 +325,22 @@ return (
                               />
                             </div>
                           ))}
+                        </label>
+                      </div>
+                      <div className={styles['flex-container-modal']}>
+                        <label className={styles['flex-item-modal']}>
+                          Gênero:
+                          <br />
+                          <select name="genero" value={clienteAtualizar.genero} onChange={handleSelectChange}>
+                              <option value="Masculino">Masculino</option>
+                              <option value="Feminino">Feminino</option>
+                              <option value="Outro">Outro</option>
+                          </select>
+                        </label>
+                        <label className={styles['flex-item-modal']}>
+                          Data de cadastro:
+                          <br />
+                          <input type="date" name="dataCadastro" value={clienteAtualizar.dataCadastro} onChange={handleInputChange} />
                         </label>
                       </div>
                       <label>
@@ -308,207 +365,4 @@ return (
 }
 
 export default ListaClientesSJC;
-
-// interface State {
-//   id?: number;
-//   nome: string;    
-//   nomeSocial: string;                     
-//   genero: string; 
-//   endereco: {
-//       cidade: string;
-//       estado: string;
-//       bairro: string;
-//       rua: string;
-//       numero: string;
-//       codigoPostal: string;
-      
-//   };
-//   telefones: {ddd: string; numero: string;}[];
-//   dataCadastro: Date;  
-  
-// }
-
-
-// function ListaClientesSJC(){
-//   const [clientes, setClientes] = useState<Cliente[]>([]);
-//   const [clienteAtualizar, setClienteAtualizar] = useState<Cliente | null>(null);
-//   const [clienteModal, setClienteModal] = useState<Cliente | null>(null);
-//   const [filtro, setFiltro] = useState('');  
-//   const [modalAlterarShow, setModalAlterarShow] = useState(false);
-//   const [modalExcluirShow, setModalExcluirShow] = useState(false);
-//   const [nome, setNome] = useState('');
-//   const [nomeSocial, setNomeSocial] = useState('');
-//   const [genero, setGenero] = useState('');
-//   const [dataCadastro, setDataCadastro] = useState(new Date());
-//   const [quantidadeConsumida, setQuantidadeConsumida] = useState(0);
-//   const [endereco, setEndereco] = useState<Endereco | null>(null);
-//   const [telefones, setTelefones] = useState<{ddd: string; numero: string;}[]>([]);
-//   const [formState, setFormState] = useState<Cliente | null>(null);
-//   const [clienteData, setClienteData] = useState({
-    
-//     nome: '',                    
-//     nomeSocial: '',                     
-//     genero: '', 
-//     endereco: {
-//       cidade: '',
-//       estado: '',
-//       bairro: '',
-//       rua: '',
-//       numero: '',
-//       codigoPostal: '',
-//     },
-//     telefones: [{ddd: '', numero: ''}],
-//     dataCadastro: new Date(),  
-//   });
-
-  
-  
-  
-// useEffect(() => {
-//   api.get(URI.BUSCAR_CLIENTES)
-//     .then(response => {
-//       setClientes(response.data);
-//     })
-//     .catch(error => {
-//       console.error(error);
-//     });
-// }, []);
-
-// const handleFiltroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//     setFiltro(event.target.value);
-// }
-
-// const clientesFiltrados = clientes.filter(cliente =>
-//     cliente.nome.toLowerCase().includes(filtro.toLowerCase()) ||
-//     cliente.sobreNome.toLowerCase().includes(filtro.toLowerCase())
-// );
-
-// const handleAlterarShow = (cliente: Cliente) => {
-//   abrirModalAtualizar(cliente);
-// };
-
-// const abrirModalAtualizar = (cliente: Cliente) => {
-//   setClienteAtualizar(cliente);
-//   setFormState(cliente); 
-//   setModalAlterarShow(true);
-// };
-
-// const [state, setState] = useState<State>({
-        
-//   nome: '',        
-//   nomeSocial: '',                     
-//   genero: '', 
-//   endereco: {
-//   cidade: '',
-//   estado: '',
-//   bairro: '',
-//   rua: '',
-//   numero: '',
-//   codigoPostal: '', 
-//   },
-//   telefones: [{ddd: '', numero: ''}],
-//   dataCadastro: new Date(),   
-        
-// });
-
-
-
-// const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//   const { name, value } = event.target;
-//   setFormState(prevState => {
-//     if (prevState) {
-//       return { ...prevState, [name]: value };
-//     }
-//     return null;
-//   });
-// };
-
-// //
-
-
-
-// function handlePhoneChange(index: number, event: React.ChangeEvent<HTMLInputElement>) {
-//   const value = event.target.value.replace(/\D/g, ''); 
-//   const ddd = value.slice(0, 2); 
-//   const numero = value.slice(2); 
-
-//   setFormState(prevState => {
-//     if (prevState) {
-//       const newTelefones = [...prevState.telefones];
-//       newTelefones[index].ddd = ddd;
-//       newTelefones[index].numero = numero;
-//       return {...prevState, telefones: newTelefones};
-//     }
-//     return prevState;
-//   });
-// }
-
-
-
-// const fetchClientes = async () => {
-//   const response = await fetch('/clientes', {
-//     headers: {
-//       'If-None-Match': '' 
-//     }
-//   });
-//   const data = await response.json();
-//   data.sort((a: Cliente, b: Cliente) => a.nome.localeCompare(b.nome));
-//   setClientes(data);
-// };
-
-
-
-
-// async function atualizarCliente(cliente: Cliente) {
-//   try {
-//     const responseCliente = await axios.put(`http://localhost:3000/cliente/atualizar/${cliente.id}`, cliente);
-
-//     if (responseCliente.status === 200) {
-//       console.log('Cliente atualizado com sucesso');
-
-//       if (cliente.endereco) {
-//         const responseEndereco = await axios.put(`http://localhost:3000/endereco/atualizar/${cliente.endereco.id}`, cliente.endereco);
-      
-//         if (responseEndereco.status === 200) {
-//           console.log('Endereço atualizado com sucesso');
-//         } else {
-//           console.log('Erro ao atualizar o endereço');
-//         }
-
-//         // Atualiza a lista de clientes após a atualização
-//         const updatedClientes = clientes.map(c => c.id === cliente.id ? cliente : c);
-//   setClientes(updatedClientes);
-//       }
-//     } else {
-//       console.log('Erro ao atualizar o cliente');
-//     }
-//   } catch (error) {
-//     console.error('Erro ao fazer a requisição PUT', error);
-//   }
-// }
-
-// useEffect(() => {
-//   fetchClientes();
-// }, []);
-
-// const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-//   event.preventDefault();
-//   if (formState) {
-//     await atualizarCliente(formState);
-//     setModalAlterarShow(false); // Fechar o modal após a atualização
-//   }
-// };
-// const handleEnderecoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-//   const { name, value } = event.target;
-//   setFormState(prevState => {
-//     if (prevState && prevState.endereco) {
-//       return { ...prevState, endereco: { ...prevState.endereco, [name]: value } };
-//     }
-//     return null;
-//   });
-// };
-
-// function formatPhoneNumber(ddd: string, numero: string) {
-//   return `(${ddd}) ${numero.substring(0, 4)}-${numero.substring(4)}`;
-// }
 
