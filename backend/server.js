@@ -73,9 +73,20 @@ app.delete('/cliente/excluir/:id', async (req, res) => {
   }
 
   try {
+    // Excluir os endereços e telefones do cliente
+    await prisma.endereco.deleteMany({
+      where: { clienteId: id },
+    });
+
+    await prisma.telefone.deleteMany({
+      where: { clienteId: id },
+    });
+
+    // Excluir o cliente
     const cliente = await prisma.cliente.delete({
       where: { id },
     });
+
     res.json(cliente);
   } catch (error) {
     console.error(error);
@@ -168,191 +179,3 @@ app.put('/cliente/atualizar/:id', async (req, res) => {
 app.listen(3001, () => { console.log('Servidor rodando na porta 3001'); });
 
 
-// const express = require('express');
-// const cors = require('cors');
-// const bodyParser = require('body-parser');
-// const { PrismaClient } = require('@prisma/client');
-
-// const prisma = new PrismaClient();
-// const app = express();
-// const helmet = require('helmet');
-
-// app.use(cors());
-
-// app.use(helmet.contentSecurityPolicy({
-//   directives: {
-//     defaultSrc: ["'self'", 'http://localhost:3001'],
-//   }
-// }));
-
-// app.use(bodyParser.urlencoded({ extended: false }));
-// app.use(bodyParser.json());
-
-// app.get('/clientes', async (req, res) => {
-//   const clientes = await prisma.cliente.findMany({
-//     include: {
-//       endereco: true,
-//       telefones: true,
-//     },
-//   });
-//   res.json(clientes);
-// });
-
-// app.get('/cliente/:id', async (req, res) => {
-//   const id = Number(req.params.id);
-
-//   if (isNaN(id)) {
-//     return res.status(400).json({ error: 'Invalid id' });
-//   }
-
-//   try {
-//     const cliente = await prisma.cliente.findUnique({
-//       where: { id },
-//       include: {
-//         endereco: true,
-//         telefones: true,
-//       },
-//     });
-
-//     if (!cliente) {
-//       return res.status(404).json({ error: 'Cliente not found' });
-//     }
-
-//     res.json(cliente);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'An error occurred while trying to fetch the cliente' });
-//   }
-// });
-
-// app.delete('/cliente/excluir/:id', async (req, res) => {
-//   const cliente = await prisma.cliente.delete({
-//     where: { id: Number(req.params.id) },
-//   });
-//   res.json(cliente);
-// });
-
-// app.post('/cliente/cadastrar', async (req, res) => {
-//   const { nome, nomeSocial, genero, dataCadastro, quantidadeConsumida, endereco, telefones } = req.body;
-
-//   try {
-//       const cliente = await prisma.cliente.create({
-//           data: {
-//               nome,
-//               nomeSocial,
-//               genero,
-//               dataCadastro,
-//               quantidadeConsumida,
-//               endereco: {
-//                   create: {
-//                       ...endereco,
-//                       codigoPostal: endereco.codigoPostal,
-//                   }
-//               },
-//               telefones: {
-//                   create: telefones
-//               }
-//           }
-//       });
-
-//       res.status(200).json(cliente);
-//   } catch (error) {
-//       console.error(error);
-//       res.status(500).json({ error: 'Ocorreu um erro ao tentar criar o cliente' });
-//   }
-// });
-
-// app.get('/cliente/:id', async (req, res) => {
-//   const id = Number(req.params.id);
-
-//   if (isNaN(id)) {
-//     return res.status(400).json({ error: 'Invalid id' });
-//   }
-
-//   try {
-//     const cliente = await prisma.cliente.findUnique({
-//       where: { id },
-//     });
-
-//     if (!cliente) {
-//       return res.status(404).json({ error: 'Cliente not found' });
-//     }
-
-//     res.json(cliente);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'An error occurred while trying to fetch the cliente' });
-//   }
-// });
-
-// app.put('/cliente/atualizar/:id', async (req, res) => {
-//   const { id } = req.params;
-//   const { nome, nomeSocial, genero, dataCadastro, quantidadeConsumida, endereco, telefones } = req.body;
-
-//   try {
-//     // Primeiro, atualize o cliente e o endereço
-//     const cliente = await prisma.cliente.update({
-//       where: { id: Number(id) },
-//       data: {
-//         nome,
-//         nomeSocial,
-//         genero,
-//         dataCadastro,
-//         quantidadeConsumida,
-//         endereco: {
-//           update: {
-//             ...endereco
-//           }
-//         },
-//       },
-//     });
-
-//     // Em seguida, atualize cada telefone
-//     for (const telefone of telefones) {
-//       await prisma.telefone.update({
-//         where: { id: telefone.id },
-//         data: telefone
-//       });
-//     }
-
-//     // Finalmente, obtenha o cliente atualizado com o endereço e os telefones
-//     const clienteAtualizado = await prisma.cliente.findUnique({
-//       where: { id: Number(id) },
-//       include: {
-//         endereco: true,
-//         telefones: true,
-//       },
-//     });
-
-//     res.json(clienteAtualizado);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ error: 'Erro ao atualizar o cliente' });
-//   }
-// });
-
-// app.put('/endereco/atualizar/:id', async (req, res) => {
-//   const { id } = req.params;
-//   const { cidade, estado, bairro, rua, numero, codigoPostal, informacoesAdicionais } = req.body;
-
-//   try {
-//     const enderecoAtualizado = await prisma.endereco.update({
-//       where: { id: Number(id) },
-//       data: {
-//         cidade,
-//         estado,
-//         bairro,
-//         rua,
-//         numero,
-//         codigoPostal,
-//         informacoesAdicionais
-//       },
-//     });
-
-//     res.json(enderecoAtualizado);
-//   } catch (error) {
-//     res.status(500).json({ error: 'Erro ao atualizar o endereço' });
-//   }
-// });
-
-// app.listen(3001, () => { console.log('Servidor rodando na porta 3001'); });

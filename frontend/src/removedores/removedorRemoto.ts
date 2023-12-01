@@ -1,3 +1,3 @@
 export default interface RemovedorRemoto {
-    remover(objeto: Object): void
+    remover(objeto: Object): Promise<Response>;
 }

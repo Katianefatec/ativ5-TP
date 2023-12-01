@@ -4,7 +4,6 @@ import styles from '../estilos/styles.module.css';
 import { Link } from 'react-router-dom';
 import { Table, Modal, Button, Form } from 'react-bootstrap';
 import RemovedorCliente from '../removedores/removedorCliente';
-import RemovedorClienteLocal from '../removedores/removedorClienteLocal';
 import { Cliente } from '../cliente'; 
 import AtualizadorCliente from '../atualizador/atualizadorCliente';
 import { Endereco } from '../cliente';
@@ -139,7 +138,11 @@ const excluirRemoto = (idCliente: string) => {
   let removedor = new RemovedorCliente();
   let cliente = clientes.find(cliente => cliente.id.toString() === idCliente);
   if (cliente) {
-    removedor.remover(cliente);
+    removedor.remover(cliente)
+      .then(() => {
+        fetchClientes(); 
+      })
+      .catch(error => console.error('Erro ao excluir cliente:', error));
   }
 };
 function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -166,6 +169,16 @@ function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
 function formatPhoneNumber(ddd: string, numero: string) {
   return `(${ddd}) ${numero.substring(0, 4)}-${numero.substring(4)}`;
 }
+
+function formatDate(date: Date) {
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // +1 porque os meses começam do 0
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+}
+
+const date = new Date();
 
 return (
   <div className={styles['container-lista']}>
@@ -198,7 +211,7 @@ return (
                     <tr className={styles['coluna-left']} key={index}>
                       <td>{cliente.nome}</td>
                       <td>{cliente.nomeSocial}</td>
-                      <td>{cliente.dataCadastro}</td>                      
+                      <td>{formatDate(new Date(cliente.dataCadastro))}</td>                    
                       <td>{cliente.genero}</td>
                       <td>{cliente.endereco && `${cliente.endereco.rua}, 
                       ${cliente.endereco.numero}, 

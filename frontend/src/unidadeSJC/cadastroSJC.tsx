@@ -4,8 +4,10 @@ import { Cliente, Endereco } from '../cliente';
 import styles from '../estilos/styles.module.css';
 import CadastradorCliente from '../cadastradores/cadastradorCliente';
 import { useHistory } from 'react-router-dom';
+
 import api from '../api';
 import { URI } from "../enuns/uri";
+
 
 interface State {
     id?: number;
@@ -28,8 +30,7 @@ interface State {
 
 
 function CadastroSJC() {
-    
-    
+    const history = useHistory();    
     const [state, setState] = useState<State>({
         
         nome: '',        
@@ -84,6 +85,7 @@ function CadastroSJC() {
                     dataCadastro: new Date(),  
                            
                 });
+                history.push('/clienteSJC');
             })
             .catch(error => {
                 console.error(error);
