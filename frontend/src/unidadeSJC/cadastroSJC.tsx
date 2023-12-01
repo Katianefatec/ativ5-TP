@@ -1,9 +1,6 @@
 import React, { ChangeEvent, FormEvent, useState } from 'react';
-import axios from 'axios';
-import { Cliente, Endereco } from '../cliente';
-import styles from '../estilos/styles.module.css';
-import CadastradorCliente from '../cadastradores/cadastradorCliente';
 import { useHistory } from 'react-router-dom';
+import styles from '../estilos/styles.module.css';
 
 import api from '../api';
 import { URI } from "../enuns/uri";
@@ -28,9 +25,24 @@ interface State {
     
 }
 
+interface Produto {
+    id?: number;
+    nome: string;
+    valor: number;
+}
+
+interface Servico {
+    id?: number;
+    nome: string;
+    valor: number;
+}
+
 
 function CadastroSJC() {
-    const history = useHistory();    
+    const history = useHistory();   
+    const [produto, setProduto] = useState<Produto>({ nome: '', valor: 0 });
+    const [servico, setServico] = useState<Servico>({ nome: '', valor: 0 });    
+    const [valorServico, setValorServico] = useState(0); 
     const [state, setState] = useState<State>({
         
         nome: '',        
@@ -47,6 +59,7 @@ function CadastroSJC() {
         },
         telefones: [{ddd: '', numero: ''}],
         dataCadastro: new Date(),   
+        
               
     });
 
@@ -125,7 +138,62 @@ function CadastroSJC() {
         const { name, value } = event.target;
         setState(prevState => ({ ...prevState, [name]: value }));
     };
+
+    function handleSubmitProduto(event: FormEvent) {
+        event.preventDefault();
     
+        api.post(URI.CADASTRAR_PRODUTO, produto)
+        .then(response => {
+            console.log(response.data);
+    
+            setProduto({ nome: '', valor: 0 });
+    
+            history.push('/produtoSJC');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+    
+    function handleSubmitServico(event: FormEvent) {
+        event.preventDefault();
+    
+        api.post(URI.CADASTRAR_SERVICO, servico)
+        .then(response => {
+            console.log(response.data);
+    
+            setServico({ nome: '', valor: 0 });
+    
+            history.push('/servicoSJC');
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+
+    function handleProductInputChange(event: ChangeEvent<HTMLInputElement>) {
+        const target = event.target;
+        let value = target.type === 'number' ? Number(target.value) : target.value;
+        const name = target.name === 'produto' ? 'nome' : 'valor';
+        
+        if (name === 'valor' && typeof value === 'string') {
+            value = parseFloat(value);
+        }
+    
+        setProduto((prevState) => ({ ...prevState, [name]: value }));
+    }
+    
+    function handleServiceInputChange(event: ChangeEvent<HTMLInputElement>) {
+        const target = event.target;
+        let value = target.type === 'number' ? Number(target.value) : target.value;
+        const name = target.name === 'servico' ? 'nome' : 'valor';
+    
+        if (name === 'valor' && typeof value === 'string') {
+            value = parseFloat(value);
+        }
+    
+        setServico((prevState) => ({ ...prevState, [name]: value }));
+    }
     return (
         <>
         <div className={styles['container-lista']}>
@@ -236,15 +304,58 @@ function CadastroSJC() {
                         <input type="submit" value="Enviar" />
                     </div>
                 </form>
-            </div>     
-        
-        
-        </div> 
-    </>
-                
-    );
-    }
+            </div>  
 
+             <div className={styles['wrap-cadastro2']}>
+                    <div className={styles['titulo-cadastro']}>
+                        <h1>Cadastro de Produtos </h1>
+                    </div>
+                    <form onSubmit={handleSubmitProduto}>
+                        <div className={styles['form-group'] + ' ' + styles['flex-container']}>
+                            <div className={styles['half']}>
+                                <label>Produto:</label>
+                                <input type="text" name="produto" value={produto.nome} onChange={handleProductInputChange} required />
+                            </div>
+                            <div className={styles['half']}>
+                                <label>Valor:</label>
+                                <input type="number" name="valorProduto" value={produto.valor} onChange={handleProductInputChange} required />
+
+
+                            </div>
+                        </div>
+                        <div className={styles['form-group']}>
+                            <input type="submit" value="Enviar" />
+                        </div>
+                    </form>
+                </div>
+             
+
+            
+                <div className={styles['wrap-cadastro2']}>
+                    <div className={styles['titulo-cadastro']}>
+                        <h1>Cadastro de Serviços </h1>
+                    </div>
+                    <form onSubmit={handleSubmitServico}>
+                        <div className={styles['form-group'] + ' ' + styles['flex-container']}>
+                            <div className={styles['half']}>
+                                <label>Serviço:</label>
+                                <input type="text" name="servico" value={servico.nome} onChange={handleServiceInputChange} required />
+                            </div>
+                            <div className={styles['half']}>
+                                <label>Valor:</label>
+                                <input type="number" name="valor" value={servico.valor} onChange={handleServiceInputChange} required />
+                            </div>
+                        </div>
+                        <div className={styles['form-group']}>
+                            <input type="submit" value="Enviar" />
+                        </div>
+                    </form>
+                </div>
+            </div> 
+        </>
+                    
+        );
+    }
     
     
 

@@ -1,13 +1,11 @@
-import React, { useEffect, useState, FormEvent} from 'react';
-import axios from 'axios';
-import styles from '../estilos/styles.module.css';
-import { Link } from 'react-router-dom';
-import { Table, Modal, Button, Form } from 'react-bootstrap';
-import RemovedorCliente from '../removedores/removedorCliente';
-import { Cliente } from '../cliente'; 
-import AtualizadorCliente from '../atualizador/atualizadorCliente';
-import { Endereco } from '../cliente';
 import 'bootstrap-icons/font/bootstrap-icons.css';
+import React, { useEffect, useState } from 'react';
+import { Form, Modal, Table } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import AtualizadorCliente from '../atualizador/atualizadorCliente';
+import { Cliente, Endereco } from '../cliente';
+import styles from '../estilos/styles.module.css';
+import RemovedorCliente from '../removedores/removedorCliente';
 
 function ListaClientesSJC(){
   const [clientes, setClientes] = useState<Cliente[]>([]);
@@ -178,7 +176,7 @@ function formatDate(date: Date) {
   return `${day}/${month}/${year}`;
 }
 
-const date = new Date();
+
 
 return (
   <div className={styles['container-lista']}>

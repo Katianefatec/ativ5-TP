@@ -3,11 +3,12 @@ import { Table, Modal, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import styles from '../estilos/styles.module.css';
 import { Link } from 'react-router-dom';
+import { URI } from "../enuns/uri";
 
 
 type Produto = {
     nome: string;
-    preco: number;
+    valor: number;
 }
 
 function ListaProdutoSJC() {
@@ -17,33 +18,11 @@ function ListaProdutoSJC() {
   const [filtroProduto, setFiltroProduto] = useState('');
 
   useEffect(() => {
-      let produtosIniciais: Produto[] = [
-        { nome: "Shampoo", preco: 100 },
-        { nome: "Condicionador", preco: 110 },
-        { nome: "Óleo secante", preco: 12 },
-        { nome: "Esmalte", preco: 10 },
-        { nome: "Máscara capilar", preco: 140 },
-        { nome: "Máscara facial", preco: 150 },
-        { nome: "Secador de cabelo", preco: 160 },
-        { nome: "Algodão", preco: 10 },
-        { nome: "Lixa", preco: 5 },
-        { nome: "Alicate", preco: 20 },
-        { nome: "Pente", preco: 15 },
-        { nome: "Escova de cabelo", preco: 30 },
-        { nome: "Creme de pentear", preco: 50 },
-        { nome: "Gel", preco: 20 },
-        { nome: "Pomada", preco: 25 },
-        { nome: "Cera", preco: 30 },
-        { nome: "Spray", preco: 40 },
-        { nome: "Mousse", preco: 45 },
-        { nome: "Gloss", preco: 30 },
-        { nome: "Batom", preco: 50 },
-        { nome: "Base", preco: 60 }
-        ];
-
-        produtosIniciais = produtosIniciais.sort((a, b) => a.nome.localeCompare(b.nome));
-        setProdutos(produtosIniciais);
-    }, []);
+    fetch(URI.BUSCAR_PRODUTOS)
+        .then(response => response.json())
+        .then(data => setProdutos(data))
+        .catch(error => console.error('Erro ao buscar serviços:', error));
+}, []);
 
   const handleEditarClick = (produto: Produto) => {
       setProdutoModal(produto);
@@ -60,10 +39,10 @@ function ListaProdutoSJC() {
     }
 };
 
-const handlePrecoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+const handlevalorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   if (produtoModal) {
       const valor = parseFloat(event.target.value.replace(/\D/g,'')) / 100;
-      setProdutoModal({ ...produtoModal, preco: valor });
+      setProdutoModal({ ...produtoModal, valor: valor });
   }
 };
 
@@ -108,7 +87,7 @@ const produtosFiltrados = produtos.filter(produto => produto.nome.toLowerCase().
                     {produtosFiltrados.map((produto, index) => (
                         <tr className={styles['coluna-left']} key={index} >
                           <td>{produto.nome}</td>
-                          <td>{produto.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                          <td>{produto.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                           <td><button onClick={() => handleEditarClick(produto)}>Editar</button></td>
                           <td><button onClick={() => handleExcluirClick(produto)}>Excluir</button></td>
                         </tr>
@@ -130,10 +109,10 @@ const produtosFiltrados = produtos.filter(produto => produto.nome.toLowerCase().
                       <input type="text" className="form-control" id="produtoNome" value={produtoModal?.nome} onChange={handleNomeChange} />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="produtoPreco">Preço</label>
-                    <input type="text" className="form-control" id="produtoPreco" 
-                        value={produtoModal?.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} 
-                        onChange={handlePrecoChange} />
+                    <label htmlFor="produtovalor">Preço</label>
+                    <input type="text" className="form-control" id="produtovalor" 
+                        value={produtoModal?.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} 
+                        onChange={handlevalorChange} />
                 </div>
                 </form>
                 </Modal.Body>

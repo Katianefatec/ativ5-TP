@@ -3,44 +3,25 @@ import { Table, Modal, Button } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import styles from '../estilos/styles.module.css';
 import { Link } from 'react-router-dom';
+import api from '../api';
+import { URI } from "../enuns/uri";
 
 type Servico = {
     nome: string;
-    preco: number;
+    valor: number;
 }
 
 function ListaServicoSJC() {
     const [servicos, setServicos] = useState<Servico[]>([]);
-    const [servicoModal, setServicoModal] = useState<Servico>({ nome: '', preco: 0 });
+    const [servicoModal, setServicoModal] = useState<Servico>({ nome: '', valor: 0 });
     const [showModal, setShowModal] = useState(false);
     const [filtroServico, setFiltroServico] = useState('');
 
     useEffect(() => {
-        let servicos: Servico[] = [
-            { nome: "Corte de cabelo feminino", preco: 80 },
-            { nome: "Corte de cabelo masculino", preco: 50 },
-            { nome: "Tratamento para quedas de cabelo", preco: 40 },
-            { nome: "Coloração", preco: 80 },
-            { nome: "Hidratação", preco: 60 },
-            { nome: "Manicure", preco: 30 },
-            { nome: "Pedicure", preco: 40 },
-            { nome: "Maquiagem", preco: 70 },
-            { nome: "Depilação", preco: 50 },
-            { nome: "Limpeza de pele", preco: 60 },
-            { nome: "Massagem", preco: 100 },
-            { nome: "Penteado", preco: 80 },
-            { nome: "Design de sobrancelha", preco: 40 },
-            { nome: "Modelagem e corte de barba", preco: 30 },
-            { nome: "Aplicação de unhas de gel", preco: 80 },
-            { nome: "Remoção de rugas", preco: 500 },
-            { nome: "Remoção de manchas na pele", preco: 300 },
-            { nome: "Aplicação de botox", preco: 200 },
-            { nome: "Tratamento para emagrecimento e redução de medias", preco: 150 },
-        ];
-
-        servicos = servicos.sort((a, b) => a.nome.localeCompare(b.nome));
-
-        setServicos(servicos);
+        fetch(URI.BUSCAR_SERVICOS)
+            .then(response => response.json())
+            .then(data => setServicos(data))
+            .catch(error => console.error('Erro ao buscar serviços:', error));
     }, []);
 
     const handleEditarClick = (servico: Servico) => {
@@ -59,10 +40,10 @@ function ListaServicoSJC() {
         }));
     };
 
-    const handlePrecoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handlevalorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (servicoModal) {
             const valor = parseFloat(event.target.value.replace(/\D/g,'')) / 100;
-            setServicoModal({ ...servicoModal, preco: valor });
+            setServicoModal({ ...servicoModal, valor: valor });
         }
     };
 
@@ -106,7 +87,7 @@ function ListaServicoSJC() {
                                 {servicos.map((servico, index) => (
                                     <tr className={styles['coluna-left']} key={index} >
                                     <td className={styles['nome-servico']} id="nome-servico">{servico.nome}</td>
-                                    <td>{servico.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                                    <td>{servico.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                     <td><button onClick={() => handleEditarClick(servico)}>Editar</button></td>
                                     <td><button onClick={() => handleExcluirClick(servico)}>Excluir</button></td>
                                     </tr>
@@ -127,10 +108,10 @@ function ListaServicoSJC() {
                             <input type="text" className="form-control" id="servicoNome" value={servicoModal?.nome} onChange={handleNomeChange} />
                         </div>
                         <div className="form-group">
-                            <label htmlFor="servicoPreco">Preço</label>
-                            <input type="text" className="form-control" id="servicoPreco" 
-                                value={servicoModal?.preco.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} 
-                                onChange={handlePrecoChange} />
+                            <label htmlFor="servicovalor">Preço</label>
+                            <input type="text" className="form-control" id="servicovalor" 
+                                value={servicoModal?.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} 
+                                onChange={handlevalorChange} />
                         </div>
                     </form>
                 </Modal.Body>

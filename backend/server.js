@@ -175,7 +175,197 @@ app.put('/cliente/atualizar/:id', async (req, res) => {
   }
 });
 
-// Iniciar o servidor
+// Rota para obter todos os produtos/serviços
+app.get('/produtos', async (req, res) => {
+  try {
+    const produtos = await prisma.produto.findMany();
+    res.json(produtos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar os produtos' });
+  }
+});
+
+// Rota para obter um produto/serviço específico
+app.get('/produto/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const produto = await prisma.produto.findUnique({
+      where: { id },
+    });
+
+    if (!produto) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    res.json(produto);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar o produto' });
+  }
+});
+
+// Rota para excluir um produto/serviço
+app.delete('/produto/excluir/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const produto = await prisma.produto.delete({
+      where: { id },
+    });
+
+    res.json(produto);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar excluir o produto' });
+  }
+});
+
+// Rota para cadastrar um novo produto/serviço
+app.post('/produto/cadastrar', async (req, res) => {
+  const { nome, valor } = req.body;
+
+  try {
+    const produto = await prisma.produto.create({
+      data: {
+
+        nome,
+        valor,
+      },
+    });
+
+    res.status(200).json(produto);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar criar o produto' });
+  }
+});
+
+// Rota para atualizar um produto/serviço
+app.put('/produto/atualizar/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nome, valor } = req.body;
+
+  try {
+    const produto = await prisma.produto.update({
+      where: { id: Number(id) },
+      data: {
+        nome,
+        valor,
+      },
+    });
+
+    res.json(produto);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar atualizar o produto' });
+  }
+});
+
+app.get('/servicos', async (req, res) => {
+  try {
+    const servicos = await prisma.servico.findMany();
+    res.json(servicos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar os servicos' });
+  }
+});
+
+// Rota para obter um produto/serviço específico
+app.get('/servico/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const servico = await prisma.servico.findUnique({
+      where: { id },
+    });
+
+    if (!servico) {
+      return res.status(404).json({ error: 'servico não encontrado' });
+    }
+
+    res.json(servico);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar o servico' });
+  }
+});
+
+// Rota para excluir um servico/serviço
+app.delete('/servico/excluir/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const servico = await prisma.servico.delete({
+      where: { id },
+    });
+
+    res.json(servico);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar excluir o servico' });
+  }
+});
+
+// Rota para cadastrar um novo servico/serviço
+app.post('/servico/cadastrar', async (req, res) => {
+  const { nome, valor } = req.body;
+
+  try {
+    const servico = await prisma.servico.create({
+      data: {
+        nome,
+        valor,
+      },
+    });
+
+    res.status(200).json(servico);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar criar o servico' });
+  }
+});
+
+// Rota para atualizar um servico/serviço
+app.put('/servico/atualizar/:id', async (req, res) => {
+  const { id } = req.params;
+  const { nome, valor } = req.body;
+
+  try {
+    const servico = await prisma.servico.update({
+      where: { id: Number(id) },
+      data: {
+        nome,
+        valor,
+      },
+    });
+
+    res.json(servico);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar atualizar o servico' });
+  }
+});
+
+
 app.listen(3001, () => { console.log('Servidor rodando na porta 3001'); });
 
 
