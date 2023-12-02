@@ -484,6 +484,55 @@ app.delete('/compra/excluir/:id', async (req, res) => {
   }
 });
 
+app.get('/compras', async (req, res) => {
+  try {
+    const compras = await prisma.compra.findMany();
+
+    res.json(compras);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar as compras' });
+  }
+});
+
+app.get('/compras/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const compra = await prisma.compra.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!compra) {
+      return res.status(404).json({ error: 'Compra não encontrada' });
+    }
+
+    res.json(compra);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar a compra' });
+  }
+});
+
+app.get('/cliente/compras/:id', async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const compras = await prisma.compra.findMany({
+      where: { clienteId: Number(id) },
+    });
+
+    if (!compras || compras.length === 0) {
+      return res.status(404).json({ error: 'Nenhuma compra encontrada para este cliente' });
+    }
+
+    res.json(compras);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar as compras' });
+  }
+});
+
 app.listen(3001, () => { console.log('Servidor rodando na porta 3001'); });
 
 

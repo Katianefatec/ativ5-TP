@@ -15,9 +15,10 @@ export enum URI {
     CADASTRAR_SERVICO = 'http://localhost:3001/servico/cadastrar',
     ATUALIZAR_SERVICO = 'http://localhost:3001/servico/atualizar',
     CRIAR_COMPRA = 'http://localhost:3001/cliente/:id/compra',
-    BUSCAR_COMPRAS = 'http://localhost:3001/cliente/compras',
+    BUSCAR_COMPRAS = 'http://localhost:3001/compras',
     ATUALIZAR_COMPRA = 'http://localhost:3001/compra/atualizar',
     DELETAR_COMPRA = 'http://localhost:3001/compra/excluir',
-    
+    BUSCAR_COMPRA_PELO_ID = 'http://localhost:3001/compras/:id',  
+    BUSCAR_COMPRA_PELO_ID_CLIENTE = 'http://localhost:3001/cliente/compras/:id',  
     
 }

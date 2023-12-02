@@ -239,7 +239,7 @@ const adicionarConsumo = async () => {
     clienteSelecionado.id,
     produto ? Number(produto.id) : null,
     servico ? Number(servico.id) : null,
-    quantidade
+    produto ? quantidadeProduto : quantidadeServico
   );
 
   try {

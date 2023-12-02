@@ -26,6 +26,8 @@ export interface Cliente {
   endereco: Endereco;
   telefones: Telefone[];
   compras: Compra[];
+  quantidadeConsumida?: number; 
+  valorConsumido?: number;
 }
 
 export interface Compra {
