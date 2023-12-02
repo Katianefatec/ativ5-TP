@@ -4,9 +4,11 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import styles from '../estilos/styles.module.css';
 import { Link } from 'react-router-dom';
 import { URI } from "../enuns/uri";
+import RemovedorProduto from '../removedores/removedorProduto';
 
 
 type Produto = {
+    id: number;
     nome: string;
     valor: number;
 }
@@ -14,15 +16,21 @@ type Produto = {
 function ListaProdutoSJC() {
   const [produtos, setProdutos] = useState<Produto[]>([]);
   const [produtoModal, setProdutoModal] = useState<Produto | null>(null);
+  const [produtoAtualizar, setProdutoAtualizar] = useState<Produto | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [filtroProduto, setFiltroProduto] = useState('');
+  const [modalExcluirShow, setModalExcluirShow] = useState(false);
+
+  const fetchProdutos = async () => {
+    const response = await fetch('http://localhost:3001/produtos');
+    const data = await response.json();
+    data.sort((a: Produto, b: Produto) => a.nome.localeCompare(b.nome));
+    setProdutos(data);
+  };
 
   useEffect(() => {
-    fetch(URI.BUSCAR_PRODUTOS)
-        .then(response => response.json())
-        .then(data => setProdutos(data))
-        .catch(error => console.error('Erro ao buscar serviços:', error));
-}, []);
+    fetchProdutos();
+  }, []);
 
   const handleEditarClick = (produto: Produto) => {
       setProdutoModal(produto);
@@ -30,32 +38,59 @@ function ListaProdutoSJC() {
   };
   
   const handleSalvarClick = () => {
-    setShowModal(false);
+    if (produtoModal) {
+      fetch(`${URI.ATUALIZAR_PRODUTO}/${produtoModal.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(produtoModal)
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Erro ao salvar o produto');
+        }
+        return response.json();
+      })
+      .then(data => {
+        setProdutos(produtos.map(produto => produto.id === data.id ? data : produto));
+        setShowModal(false);
+      })
+      .catch(error => console.error('Erro:', error));
+    }
   };
 
-  const handleNomeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (produtoModal) {
-        setProdutoModal({ ...produtoModal, nome: event.target.value });
-    }
+const handleFiltroProdutoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFiltroProduto(event.target.value);
+};
+
+const handleNomeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  if (produtoModal) {
+      setProdutoModal({ ...produtoModal, nome: event.target.value });
+  }
 };
 
 const handlevalorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  if (produtoModal) {
-      const valor = parseFloat(event.target.value.replace(/\D/g,'')) / 100;
-      setProdutoModal({ ...produtoModal, valor: valor });
-  }
+if (produtoModal) {
+    const valor = parseFloat(event.target.value.replace(/\D/g,'')) / 100;
+    setProdutoModal({ ...produtoModal, valor: valor });
+}
 };
 
 const handleCloseModal = () => {
     setShowModal(false);
 };
 
-const handleExcluirClick = (produto: Produto) => {
-    setProdutos(produtos.filter(p => p !== produto));
-};
-
-const handleFiltroProdutoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFiltroProduto(event.target.value);
+const handleExcluirClick = (idProduto: string) => {
+  let removedor = new RemovedorProduto ();
+  let produto = produtos.find(produto => produto.id.toString() === idProduto);
+  if (produto) {
+    removedor.remover(produto)
+      .then(() => {
+        fetchProdutos(); 
+      })
+      .catch(error => console.error('Erro ao excluir produto:', error));
+  }
 };
 
 const produtosFiltrados = produtos.filter(produto => produto.nome.toLowerCase().includes(filtroProduto.toLowerCase()));
@@ -89,7 +124,7 @@ const produtosFiltrados = produtos.filter(produto => produto.nome.toLowerCase().
                           <td>{produto.nome}</td>
                           <td>{produto.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                           <td><button onClick={() => handleEditarClick(produto)}>Editar</button></td>
-                          <td><button onClick={() => handleExcluirClick(produto)}>Excluir</button></td>
+                          <td><button onClick={() => handleExcluirClick(produto.id.toString())}>Excluir</button></td>
                         </tr>
                     ))}
                     </tbody>

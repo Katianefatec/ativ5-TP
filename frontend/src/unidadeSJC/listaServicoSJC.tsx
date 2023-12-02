@@ -5,8 +5,10 @@ import styles from '../estilos/styles.module.css';
 import { Link } from 'react-router-dom';
 import api from '../api';
 import { URI } from "../enuns/uri";
+import RemovedorServico from '../removedores/removedorServico';
 
 type Servico = {
+    id?: number;
     nome: string;
     valor: number;
 }
@@ -17,47 +19,80 @@ function ListaServicoSJC() {
     const [showModal, setShowModal] = useState(false);
     const [filtroServico, setFiltroServico] = useState('');
 
-    useEffect(() => {
-        fetch(URI.BUSCAR_SERVICOS)
-            .then(response => response.json())
-            .then(data => setServicos(data))
-            .catch(error => console.error('Erro ao buscar serviços:', error));
-    }, []);
-
-    const handleEditarClick = (servico: Servico) => {
-        setServicoModal(servico);
+    const fetchServicos = async () => {
+        const response = await fetch('http://localhost:3001/servicos');
+        const data = await response.json();
+        data.sort((a: Servico, b: Servico) => a.nome.localeCompare(b.nome));
+        setServicos(data);
+      };
+    
+      useEffect(() => {
+        fetchServicos();
+      }, []);
+    
+    const handleEditarClick = (produto: Servico) => {
+        setServicoModal(produto);
         setShowModal(true);
     };
-
+    
+      
     const handleSalvarClick = () => {
-        setShowModal(false);
-    };
-
-    const handleNomeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setServicoModal(prevServicoModal => ({
-            ...prevServicoModal,
-            nome: event.target.value || prevServicoModal.nome
-        }));
-    };
-
-    const handlevalorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (servicoModal) {
-            const valor = parseFloat(event.target.value.replace(/\D/g,'')) / 100;
-            setServicoModal({ ...servicoModal, valor: valor });
+          fetch(`${URI.ATUALIZAR_SERVICO}/${servicoModal.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(servicoModal)
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Erro ao salvar o servico');
+            }
+            return response.json();
+          })
+          .then(data => {
+            setServicos(servicos.map(servico => servico.id === data.id ? data : servico));
+            setShowModal(false);
+          })
+          .catch(error => console.error('Erro:', error));
         }
-    };
-
-    const handleExcluirClick = (servico: Servico) => {
-        setServicos(prevServicos => prevServicos.filter(s => s !== servico));
-    };
-
+      };
+    
     const handleFiltroServicoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFiltroServico(event.target.value);
+    };
+    
+    const handleNomeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      if (servicoModal) {
+          setServicoModal({ ...servicoModal, nome: event.target.value });
+      }
+    };
+    
+    const handlevalorChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (servicoModal) {
+        const valor = parseFloat(event.target.value.replace(/\D/g,'')) / 100;
+        setServicoModal({ ...servicoModal, valor: valor });
     }
-
+    };
+    
     const handleCloseModal = () => {
         setShowModal(false);
     };
+    
+    const handleExcluirClick = (idProduto: string) => {
+        let removedor = new RemovedorServico();
+        let servico = servicos.find(servico => servico.id?.toString() === idProduto);
+        if (servico && servico.id) {
+            removedor.remover({ ...servico, id: servico.id })
+                .then(() => {
+                    fetchServicos();
+                })
+                .catch(error => console.error('Erro ao excluir produto:', error));
+        }
+    };
+    
+    const servicosFiltrados = servicos.filter((servico) => servico.nome.toLowerCase().includes(filtroServico));
 
     return (
         
@@ -84,12 +119,12 @@ function ListaServicoSJC() {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {servicos.map((servico, index) => (
+                                {servicosFiltrados.map((servico, index) => (
                                     <tr className={styles['coluna-left']} key={index} >
                                     <td className={styles['nome-servico']} id="nome-servico">{servico.nome}</td>
                                     <td>{servico.valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
                                     <td><button onClick={() => handleEditarClick(servico)}>Editar</button></td>
-                                    <td><button onClick={() => handleExcluirClick(servico)}>Excluir</button></td>
+                                    <td><button onClick={() => servico.id && handleExcluirClick(servico.id.toString())}>Excluir</button></td>
                                     </tr>
                                 ))}
                             </tbody>
