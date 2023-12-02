@@ -1,5 +1,5 @@
-import { Cliente } from '../cliente'; // Importe a interface Cliente
 import { URI } from "../enuns/uri";
+import { Cliente } from '../modelo/cliente'; // Importe a interface Cliente
 import RemovedorRemoto from "./removedorRemoto";
 
 export default class RemovedorCliente implements RemovedorRemoto {

@@ -25,4 +25,13 @@ export interface Cliente {
   dataCadastro: string;
   endereco: Endereco;
   telefones: Telefone[];
+  compras: Compra[];
+}
+
+export interface Compra {
+  id: number;
+  quantidade: number;
+  clienteId: number;
+  produtoId: number;
+  servicoId: number;
 }

@@ -365,6 +365,124 @@ app.put('/servico/atualizar/:id', async (req, res) => {
   }
 });
 
+// Rota para obter todas as compras de um cliente
+app.get('/cliente/:id/compras', async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const compras = await prisma.compra.findMany({
+      where: { clienteId: id },
+    });
+
+    res.json(compras);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar buscar as compras' });
+  }
+});
+
+// Rota para criar uma nova compra
+app.post('/cliente/:id/compra', async (req, res) => {
+  const id = Number(req.params.id);
+  const { produtoId, servicoId, valor, quantidade } = req.body;
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const cliente = await prisma.cliente.findUnique({ where: { id } });
+
+    if (!cliente) {
+      return res.status(404).json({ error: 'Cliente não encontrado' });
+    }
+
+    const produto = await prisma.produto.findUnique({ where: { id: produtoId } });
+
+    if (!produto) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    const servico = await prisma.servico.findUnique({ where: { id: servicoId } });
+
+    if (!servico) {
+      return res.status(404).json({ error: 'Serviço não encontrado' });
+    }
+
+    const compra = await prisma.compra.create({
+      data: {        
+        valor,        
+        quantidade,
+        cliente: {
+          connect: { id }
+        },
+        produto: {
+          connect: { id: produtoId }
+        },
+        servico: {
+          connect: { id: servicoId }
+        }
+      },
+    });
+
+    res.status(200).json(compra);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar criar a compra' });
+  }
+});
+
+// Rota para atualizar uma compra
+app.put('/compra/atualizar/:id', async (req, res) => {
+  const id = Number(req.params.id);
+  const { produto, quantidade, valor, dataCompra } = req.body;
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const compra = await prisma.compra.update({
+      where: { id },
+      data: {
+        produto,
+        valor,
+        clienteId: id,
+        quantidade,
+        
+      },
+    });
+
+    res.json(compra);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar atualizar a compra' });
+  }
+});
+
+// Rota para excluir uma compra
+app.delete('/compra/excluir/:id', async (req, res) => {
+  const id = Number(req.params.id);
+
+  if (isNaN(id)) {
+    return res.status(400).json({ error: 'ID inválido' });
+  }
+
+  try {
+    const compra = await prisma.compra.delete({
+      where: { id },
+    });
+
+    res.json(compra);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar excluir a compra' });
+  }
+});
 
 app.listen(3001, () => { console.log('Servidor rodando na porta 3001'); });
 

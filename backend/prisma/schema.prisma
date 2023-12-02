@@ -63,3 +63,4 @@ model Endereco {
   cliente               Cliente @relation(fields: [clienteId], references: [id])
   clienteId             Int     @unique
 }
+

@@ -1,36 +1,43 @@
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import React, { useEffect, useState } from 'react';
-import { Form, Modal, Table } from 'react-bootstrap';
+import { Button, Form, Modal, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import AtualizadorCliente from '../atualizador/atualizadorCliente';
-import { Cliente, Endereco } from '../cliente';
+import CadastradorCompra from '../cadastradores/cadastradorCompra';
 import styles from '../estilos/styles.module.css';
+import { Cliente, Endereco } from '../modelo/cliente';
 import RemovedorCliente from '../removedores/removedorCliente';
+import Compra from '../modelo/compra';
+
+interface Produto {
+  id: string;
+  nome: string;
+  valor: number;  
+}
+
+interface Servico {
+  id: string;
+  nome: string;
+  valor: number;    
+}
+
+
+
 
 function ListaClientesSJC(){
   const [clientes, setClientes] = useState<Cliente[]>([]);
-  const [clienteAtualizar, setClienteAtualizar] = useState<Cliente | null>(null);
-  const [clienteModal, setClienteModal] = useState<Cliente | null>(null);
+  const [clienteAtualizar, setClienteAtualizar] = useState<Cliente | null>(null);  
   const [filtro, setFiltro] = useState('');  
-  const [modalAlterarShow, setModalAlterarShow] = useState(false);
-  const [modalExcluirShow, setModalExcluirShow] = useState(false);
-  const [state, setState] = useState<Cliente>({
-    id: 0,
-    nome: '',
-    nomeSocial: '',
-    genero: '',
-    endereco: {
-      cidade: '',
-      estado: '',
-      bairro: '',
-      rua: '',
-      numero: '',
-      codigoPostal: '',
-      informacoesAdicionais: '',
-    },
-    telefones: [],
-    dataCadastro: new Date().toISOString(),
-  });
+  const [modalAlterarShow, setModalAlterarShow] = useState(false);  
+  const [produtoSelecionado, setProdutoSelecionado] = useState<string>('');
+  const [servicoSelecionado, setServicoSelecionado] = useState<string>('');  
+  const [modalConsumoShow, setModalConsumoShow] = useState(false);
+  const [produtos, setProdutos] = useState<Produto[]>([]);
+  const [servicos, setServicos] = useState<Servico[]>([]); 
+  const [clienteSelecionado, setClienteSelecionado] = useState<Cliente | null>(null);
+  const [quantidade, setQuantidade] = useState(0);
+  
+  
 
   
   
@@ -45,6 +52,18 @@ useEffect(() => {
              })
              .catch(error => console.error('Erro ao buscar clientes:', error));
      }, []);
+
+useEffect(() => {
+fetch('http://localhost:3001/produtos')
+  .then(response => response.json())
+  .then(data => setProdutos(data))
+  .catch(error => console.error('Erro ao buscar produtos:', error));
+
+fetch('http://localhost:3001/servicos')
+  .then(response => response.json())
+  .then(data => setServicos(data))
+  .catch(error => console.error('Erro ao buscar serviços:', error));
+}, []);
 
 const handleFiltroChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFiltro(event.target.value);
@@ -164,6 +183,25 @@ function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
 }
 
 
+const handleProdutoChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  setProdutoSelecionado(event.target.value);
+};
+
+const handleServicoChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  setServicoSelecionado(event.target.value);
+};
+
+const handleQuantidadeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  setQuantidade(Number(event.target.value));
+}
+const handleConsumoClick = (cliente: Cliente) => {
+  // Defina o cliente selecionado
+  setClienteSelecionado(cliente);
+
+  // Abra o modal de consumo
+  setModalConsumoShow(true);
+};
+
 function formatPhoneNumber(ddd: string, numero: string) {
   return `(${ddd}) ${numero.substring(0, 4)}-${numero.substring(4)}`;
 }
@@ -176,6 +214,38 @@ function formatDate(date: Date) {
   return `${day}/${month}/${year}`;
 }
 
+const cadastradorCompra = new CadastradorCompra();
+
+
+const adicionarConsumo = async () => {
+  if (!clienteSelecionado) {
+    alert('Por favor, selecione um cliente.');
+    return;
+  }
+
+  const produto = produtos.find(produto => Number(produto.id) === Number(produtoSelecionado));
+  const servico = servicos.find(servico => servico && Number(servico.id) === Number(servicoSelecionado));
+
+  if (!produto && !servico) {
+    alert('Por favor, selecione um produto ou serviço.');
+    return;
+  }
+
+  const compra = new Compra(
+    clienteSelecionado.id,
+    produto ? Number(produto.id) : null,
+    servico ? Number(servico.id) : null,
+    quantidade
+  );
+
+  try {
+    await cadastradorCompra.cadastrar(compra);
+    alert('Compra adicionada com sucesso.');
+  } catch (error) {
+    console.error(error);
+    alert('Ocorreu um erro ao tentar adicionar a compra.');
+  }
+};
 
 
 return (
@@ -194,43 +264,45 @@ return (
                   <thead>
                       <tr className={styles['coluna-left']}>
                           <th>Nome</th>
-                          <th>Sobrenome</th>
+                          <th>Nome Social</th>
                           <th>Data de cadastro</th>
                           <th>Genero</th>
                           <th>Endereço</th>  
-                          <th>Telefone</th>                                                  
+                          <th>Telefone</th> 
+                          <th>Consumo</th>                                                 
                           <th>Editar</th>
                           <th>Excluir</th>
                           
                       </tr>
-                  </thead>
+                  </thead>                  
                   <tbody>
-                  {clientesFiltrados.map((cliente, index) => (
-                    <tr className={styles['coluna-left']} key={index}>
-                      <td>{cliente.nome}</td>
-                      <td>{cliente.nomeSocial}</td>
-                      <td>{formatDate(new Date(cliente.dataCadastro))}</td>                    
-                      <td>{cliente.genero}</td>
-                      <td>{cliente.endereco && `${cliente.endereco.rua}, 
-                      ${cliente.endereco.numero}, 
-                      ${cliente.endereco.bairro}, 
-                      ${cliente.endereco.cidade}, 
-                      ${cliente.endereco.estado}, 
-                      ${cliente.endereco.codigoPostal}`}
-                      </td>
-                      {cliente && cliente.telefones ? cliente.telefones.map((telefone, index) => (
-                        <td key={index}>
-                          {telefone.ddd} {telefone.numero}
+                    {clientesFiltrados.map((cliente, clienteIndex) => (
+                      <tr className={styles['coluna-left']} key={clienteIndex}>
+                        <td>{cliente.nome}</td>
+                        <td>{cliente.nomeSocial}</td>
+                        <td>{formatDate(new Date(cliente.dataCadastro))}</td>                    
+                        <td>{cliente.genero}</td>
+                        <td>{cliente.endereco && `${cliente.endereco.rua}, 
+                        ${cliente.endereco.numero}, 
+                        ${cliente.endereco.bairro}, 
+                        ${cliente.endereco.cidade}, 
+                        ${cliente.endereco.estado}, 
+                        ${cliente.endereco.codigoPostal}`}
                         </td>
-                      )) : ''}                      
-                      <td>
-                      <button onClick={() => handleAlterarShow(cliente)}>Editar</button>
-                      </td>
-                      <td>
-                        <button onClick={(e) => excluirRemoto(cliente.id.toString())}>Excluir</button>
-                      </td>
-                    </tr>
-                  ))}
+                        {cliente && cliente.telefones ? cliente.telefones.map((telefone, telefoneIndex) => (
+                          <td key={`${clienteIndex}-${telefoneIndex}`}>
+                            {telefone.ddd} {telefone.numero}
+                          </td>
+                        )) : ''}                      
+                        <td><button onClick={() => handleConsumoClick(cliente)}>Adicionar</button></td>
+                        <td>
+                        <button onClick={() => handleAlterarShow(cliente)}>Editar</button>
+                        </td>
+                        <td>
+                          <button onClick={(e) => excluirRemoto(cliente.id.toString())}>Excluir</button>
+                        </td>
+                      </tr>
+                    ))}
                   </tbody>
               </Table>              
             </div>
@@ -366,6 +438,49 @@ return (
                   )}
                 </Form>
               </Modal.Body>
+            </Modal>
+            <Modal show={modalConsumoShow} onHide={() => setModalConsumoShow(false)}>
+              <Modal.Header closeButton>
+                <Modal.Title>Adicionar Consumo</Modal.Title>
+              </Modal.Header>
+              <Modal.Body>
+              <form>
+                <label>
+                  Produto:
+                  <select value={produtoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleProdutoChange(event)}>
+                    <option value="">Selecione um produto</option>
+                    {produtos.map(produto => (
+                      <option key={produto.id} value={produto.id}>{produto.nome}</option>
+                    ))}
+                  </select>
+                </label>
+                <br />
+                <br />
+                <label>
+                  Serviço:
+                  <select value={servicoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleServicoChange(event)}>
+                    <option value="">Selecione um serviço</option>
+                    {servicos.map(servico => (
+                      <option key={servico.id} value={servico.id}>{servico.nome}</option>
+                    ))}
+                  </select>
+                </label>
+                <br />
+                <br />
+                <label>
+                  Quantidade:
+                  <input type="number" value={quantidade} onChange={handleQuantidadeChange} />
+                </label>
+              </form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="secondary" onClick={() => setModalConsumoShow(false)}>
+                  Fechar
+                </Button>
+                <Button variant="primary" onClick={adicionarConsumo}>
+                  Salvar
+                </Button>
+              </Modal.Footer>
             </Modal>
             
         </div>
