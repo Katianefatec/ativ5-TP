@@ -191,14 +191,18 @@ const handleServicoChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
   setServicoSelecionado(event.target.value);
 };
 
-const handleQuantidadeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  setQuantidade(Number(event.target.value));
-}
-const handleConsumoClick = (cliente: Cliente) => {
-  // Defina o cliente selecionado
-  setClienteSelecionado(cliente);
+const [quantidadeProduto, setQuantidadeProduto] = useState(0);
+const [quantidadeServico, setQuantidadeServico] = useState(0);
 
-  // Abra o modal de consumo
+const handleQuantidadeProdutoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  setQuantidadeProduto(Number(event.target.value));
+};
+
+const handleQuantidadeServicoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  setQuantidadeServico(Number(event.target.value));
+};
+const handleConsumoClick = (cliente: Cliente) => {
+  setClienteSelecionado(cliente);  
   setModalConsumoShow(true);
 };
 
@@ -441,37 +445,43 @@ return (
             </Modal>
             <Modal show={modalConsumoShow} onHide={() => setModalConsumoShow(false)}>
               <Modal.Header closeButton>
-                <Modal.Title>Adicionar Consumo</Modal.Title>
+                <Modal.Title className={styles['modal-title']}>
+                 {clienteSelecionado ? clienteSelecionado.nome : 'Nenhum cliente selecionado'} 
+                </Modal.Title>                
               </Modal.Header>
               <Modal.Body>
-              <form>
-                <label>
-                  Produto:
-                  <select value={produtoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleProdutoChange(event)}>
-                    <option value="">Selecione um produto</option>
-                    {produtos.map(produto => (
-                      <option key={produto.id} value={produto.id}>{produto.nome}</option>
-                    ))}
-                  </select>
-                </label>
-                <br />
-                <br />
-                <label>
-                  Serviço:
-                  <select value={servicoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleServicoChange(event)}>
-                    <option value="">Selecione um serviço</option>
-                    {servicos.map(servico => (
-                      <option key={servico.id} value={servico.id}>{servico.nome}</option>
-                    ))}
-                  </select>
-                </label>
-                <br />
-                <br />
-                <label>
-                  Quantidade:
-                  <input type="number" value={quantidade} onChange={handleQuantidadeChange} />
-                </label>
-              </form>
+                <form>
+                  <label>
+                    Produto:
+                    <select value={produtoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleProdutoChange(event)}>
+                      <option value="">Selecione um produto</option>
+                      {produtos.map(produto => (
+                        <option key={produto.id} value={produto.id}>{produto.nome}</option>
+                      ))}
+                    </select>
+                  </label>                  
+                  <br />                  
+                  <label>
+                    Quantidade:
+                    <input type="number" value={quantidadeProduto} onChange={handleQuantidadeProdutoChange} />
+                  </label>
+                  <br />
+                  <br />
+                  <label>
+                    Serviço:
+                    <select value={servicoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleServicoChange(event)}>
+                      <option value="">Selecione um serviço</option>
+                      {servicos.map(servico => (
+                        <option key={servico.id} value={servico.id}>{servico.nome}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <br />
+                  <label>
+                    Quantidade:
+                    <input type="number" value={quantidadeServico} onChange={handleQuantidadeServicoChange} />
+                  </label>
+                </form>
               </Modal.Body>
               <Modal.Footer>
                 <Button variant="secondary" onClick={() => setModalConsumoShow(false)}>
