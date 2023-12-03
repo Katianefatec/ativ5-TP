@@ -9,7 +9,7 @@
 <span id="sobre">
 
 ## :mag_right: Sobre o projeto
- O Grupo World Beauty (WB) solicitou um programa de cadastro de clientes para trazer informações que permite um contato mais próximo com seus clientes e para melhorar suas vendas. A agenda, inicialmente, será um sistema do tipo cli (command-line interface), ou seja, deverá funcionar sem uma interface gráfica, apenas pela linha de comando.
+ O Grupo World Beauty (WB) solicitou um programa de cadastro de clientes para trazer informações que permite um contato mais próximo com seus clientes e para melhorar suas vendas. 
  
 <br>
     
