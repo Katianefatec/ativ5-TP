@@ -73,6 +73,20 @@ app.delete('/cliente/excluir/:id', async (req, res) => {
   }
 
   try {
+    // Verificar se o cliente existe
+    const clienteExistente = await prisma.cliente.findUnique({
+      where: { id },
+    });
+
+    if (!clienteExistente) {
+      return res.status(404).json({ error: 'Cliente não encontrado' });
+    }
+
+    // Excluir as compras do cliente
+    await prisma.compra.deleteMany({
+      where: { clienteId: id },
+    });
+
     // Excluir os endereços e telefones do cliente
     await prisma.endereco.deleteMany({
       where: { clienteId: id },
@@ -93,7 +107,6 @@ app.delete('/cliente/excluir/:id', async (req, res) => {
     res.status(500).json({ error: 'Ocorreu um erro ao tentar excluir o cliente' });
   }
 });
-
 // Rota para cadastrar um novo cliente
 app.post('/cliente/cadastrar', async (req, res) => {
   const { nome, nomeSocial, genero, dataCadastro, quantidadeConsumida, endereco, telefones } = req.body;
@@ -219,6 +232,21 @@ app.delete('/produto/excluir/:id', async (req, res) => {
   }
 
   try {
+    // Verificar se o produto existe
+    const produtoExistente = await prisma.produto.findUnique({
+      where: { id },
+    });
+
+    if (!produtoExistente) {
+      return res.status(404).json({ error: 'Produto não encontrado' });
+    }
+
+    // Excluir as compras associadas ao produto
+    await prisma.compra.deleteMany({
+      where: { produtoId: id },
+    });
+
+    // Excluir o produto
     const produto = await prisma.produto.delete({
       where: { id },
     });
@@ -314,6 +342,21 @@ app.delete('/servico/excluir/:id', async (req, res) => {
   }
 
   try {
+    // Verificar se o serviço existe
+    const servicoExistente = await prisma.servico.findUnique({
+      where: { id },
+    });
+
+    if (!servicoExistente) {
+      return res.status(404).json({ error: 'Serviço não encontrado' });
+    }
+
+    // Excluir as compras associadas ao serviço
+    await prisma.compra.deleteMany({
+      where: { servicoId: id },
+    });
+
+    // Excluir o serviço
     const servico = await prisma.servico.delete({
       where: { id },
     });
@@ -321,7 +364,7 @@ app.delete('/servico/excluir/:id', async (req, res) => {
     res.json(servico);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Ocorreu um erro ao tentar excluir o servico' });
+    res.status(500).json({ error: 'Ocorreu um erro ao tentar excluir o serviço' });
   }
 });
 
