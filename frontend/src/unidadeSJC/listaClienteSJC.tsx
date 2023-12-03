@@ -460,10 +460,10 @@ return (
               <Modal.Body>
                 <form>
                   <label>
-                    Produto:
+                  Produto:
                     <select value={produtoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleProdutoChange(event)}>
                       <option value="">Selecione um produto</option>
-                      {produtos.map(produto => (
+                      {produtos.sort((a, b) => a.nome.localeCompare(b.nome)).map(produto => (
                         <option key={produto.id} value={produto.id}>{produto.nome}</option>
                       ))}
                     </select>
@@ -479,7 +479,7 @@ return (
                     Serviço:
                     <select value={servicoSelecionado} onChange={(event: React.ChangeEvent<HTMLSelectElement>) => handleServicoChange(event)}>
                       <option value="">Selecione um serviço</option>
-                      {servicos.map(servico => (
+                      {servicos.sort((a, b) => a.nome.localeCompare(b.nome)).map(servico => (
                         <option key={servico.id} value={servico.id}>{servico.nome}</option>
                       ))}
                     </select>
