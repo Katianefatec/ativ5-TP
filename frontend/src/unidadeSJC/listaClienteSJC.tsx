@@ -206,6 +206,14 @@ const handleConsumoClick = (cliente: Cliente) => {
   setModalConsumoShow(true);
 };
 
+const fecharModal = () => {
+  setModalConsumoShow(false);
+  setProdutoSelecionado('');
+  setServicoSelecionado('');
+  setQuantidadeProduto(0);
+  setQuantidadeServico(0);
+};
+
 function formatPhoneNumber(ddd: string, numero: string) {
   return `(${ddd}) ${numero.substring(0, 4)}-${numero.substring(4)}`;
 }
@@ -484,7 +492,7 @@ return (
                 </form>
               </Modal.Body>
               <Modal.Footer>
-                <Button variant="secondary" onClick={() => setModalConsumoShow(false)}>
+              <Button variant="secondary" onClick={fecharModal}>
                   Fechar
                 </Button>
                 <Button variant="primary" onClick={adicionarConsumo}>
