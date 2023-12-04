@@ -107,3 +107,9 @@ npm install
 ~~~
 npm start
 ~~~
+~~~
+- faça o login
+~~~
+e-mail: unidadesjc@gmail.com
+
+senha padrão: 1234
