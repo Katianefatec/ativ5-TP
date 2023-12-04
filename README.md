@@ -99,6 +99,10 @@ npm install
 ~~~
 cd ..
 ~~~
+- instale as dependências
+~~~
+npm install
+~~~
 - execute o sistema
 ~~~
 npm start
